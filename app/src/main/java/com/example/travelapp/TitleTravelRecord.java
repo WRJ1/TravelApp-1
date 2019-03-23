@@ -20,6 +20,7 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
     //private RelativeLayout mLayoutTitleBar;
     private TextView mTitleTextView;
     private Button mBackwardbButton;
+    private Button mUploaddbButton;
     private FrameLayout mContentLayout;
 
 
@@ -38,15 +39,8 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
         mTitleTextView = (TextView) findViewById(R.id.title_text);
         mContentLayout = (FrameLayout) findViewById(R.id.layout_content);
         mBackwardbButton = (Button) findViewById(R.id.title_back);
-        /*mBackwardbButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(this, "点击返回，可在此处调用finish()", Toast.LENGTH_LONG).show();
-                /*Intent intent=new Intent(this,MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });*/
+        mUploaddbButton = (Button)findViewById(R.id.btn_upload);
+
     }
 
     /**
@@ -66,6 +60,39 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
         } // else ignored
     }
 
+    /**
+     * 是否显示提交按钮
+     *
+     * @param show          true则显示
+     */
+
+    protected void showUploadView(boolean show) {
+        if (mUploaddbButton != null) {
+            if (show) {
+                //mBackwardbButton.setText(backwardResid);
+                mUploaddbButton.setVisibility(View.VISIBLE);
+            } else {
+                mUploaddbButton.setVisibility(View.INVISIBLE);
+            }
+        } // else ignored
+    }
+
+    /**
+     * 是否显示标题文字
+     *
+     * @param show          true则显示
+     */
+
+    protected void showTitleTextView(boolean show) {
+        if (mTitleTextView != null) {
+            if (show) {
+                //mBackwardbButton.setText(backwardResid);
+                mTitleTextView.setVisibility(View.VISIBLE);
+            } else {
+                mTitleTextView.setVisibility(View.INVISIBLE);
+            }
+        } // else ignored
+    }
 
 
     /**
@@ -80,6 +107,20 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
         startActivity(intent);*/
         finish();
     }
+
+    /**
+     * 提交按钮点击后触发
+     *
+     * @param uploadView
+     */
+    protected void onUpload(View uploadView) {
+        //mBackwardbButton.setOnClickListener();
+        Toast.makeText(this, "点击提交，可在此处调用finish()", Toast.LENGTH_LONG).show();
+        /*Intent intent=new Intent(this,MainActivity.class);
+        startActivity(intent);*/
+        finish();
+    }
+
 
 
     //设置标题内容
@@ -130,7 +171,9 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
             case R.id.title_back:
                 onBackward(v);
                 break;
-
+            case R.id.btn_upload:
+                onUpload(v);
+                break;
             default:
                 break;
         }

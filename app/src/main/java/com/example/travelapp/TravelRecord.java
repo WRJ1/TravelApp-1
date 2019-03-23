@@ -24,6 +24,8 @@ public class TravelRecord extends TitleTravelRecord {
 
         setTitle("TRAVEL RECORD");
         showBackwardView(true);
+        showTitleTextView(true);
+        showUploadView(false);
 
         //初始化记录数据
         initRecords();
@@ -36,7 +38,29 @@ public class TravelRecord extends TitleTravelRecord {
         recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(adapter);
 
-        adapter.setItemClickListener(new OnRecyclerViewClickListener() {
+
+        adapter.setOnItemClickLitener(new RecordAdapter.OnItemClickLitener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                //String id = infoBeen.get(position).getId();
+                //String id = infoBeen.get(position).getId();
+                position = recyclerView.getChildAdapterPosition(view);
+                Intent intent;
+                switch (position) {
+                    case 0:
+                        //setContentView(R.layout.activity_travel_record_detail);
+                        intent = new Intent(TravelRecord.this, TravelRecordDetail.class);
+                        startActivity(intent);
+                        break;
+                    case 1:
+                        //setContentView(R.layout.activity_travel_record_detail);
+                        intent = new Intent(TravelRecord.this, TravelRecordDetail.class);
+                        startActivity(intent);
+                        break;
+                }
+            }
+        });
+        /*adapter.setItemClickListener(new OnRecyclerViewClickListener() {
             @Override
             public void onItemClickListener(View view) {
                 int position = recyclerView.getChildAdapterPosition(view);
@@ -54,9 +78,8 @@ public class TravelRecord extends TitleTravelRecord {
             public void onItemLongClickListener(View view) {
 
             }
-        });
+        });*/
         }
-
 
     private void initRecords(){
             Record r1 = new Record("2018/03/19", "CQU-HongyaCave");
