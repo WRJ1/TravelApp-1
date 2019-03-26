@@ -19,8 +19,9 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.amap.api.maps2d.UiSettings;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     private Button btnStart;
     private MapView mapView;//地图控件
     private AMap aMap;//地图对象
@@ -30,11 +31,9 @@ public class MainActivity extends AppCompatActivity {
     private AMapLocationClient mLocationClient = null;//定位发起端
     private AMapLocationClientOption mLocationOption = null;//定位参数
     private AMapLocationListener mListener = null;//定位监听器
-
-    //标识，用于判断是否只显示一次定位信息和用户重新定位
-    private boolean isFirstLoc = true;
+    private boolean isFirstLoc = true;//用于判断是否重新定位
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ActionBar actionbar = getSupportActionBar();
@@ -49,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         aMap = mapView.getMap();
         Button titleHistory = (Button)findViewById(R.id.title_history);
         Button titleNewRoute = (Button)findViewById(R.id.title_newroute);
+
         titleHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
