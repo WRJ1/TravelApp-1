@@ -1,28 +1,18 @@
 package com.example.travelapp;
 
-import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.os.SystemClock;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -30,7 +20,6 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -58,16 +47,16 @@ public class PhotoWithWord extends TitleTravelRecord {
         Intent intentroutefile = getIntent();
         routefile = intentroutefile.getStringExtra("starttime");
         setFilename(routefile);
-        Log.e("starttime",routefile);
+        Log.e("starttime", routefile);
 
 
-        photoPath = Environment.getExternalStorageDirectory().getPath() +"/pictures/"+routefile + "_" + filename() + ".jpg";
+        photoPath = Environment.getExternalStorageDirectory().getPath() + "/pictures/" + routefile + "_" + filename() + ".jpg";
         //文本框记录文字
         typewords = (EditText) findViewById(R.id.edit_content);
         typewords.addTextChangedListener(edit);
 
         //调用相机并显示照片
-        picture   = (ImageView) findViewById(R.id.img_photo);
+        picture = (ImageView) findViewById(R.id.img_photo);
         bundle = this.getIntent().getExtras();
         Show_Choice = bundle.getInt("id");
 
@@ -108,6 +97,7 @@ public class PhotoWithWord extends TitleTravelRecord {
                 break;
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //super.onActivityResult(requestCode, resultCode, data);
@@ -121,15 +111,14 @@ public class PhotoWithWord extends TitleTravelRecord {
                         final File newSdcardTempFile = new File(photoPath);
                         //FileInputStream inputStream = new FileInputStream(sdcardTempFile);
                         FileInputStream inputStream = new FileInputStream(newSdcardTempFile);
-                        Log.e("photoname",photoPath);
+                        Log.e("photoname", photoPath);
                         //显示照片
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         picture.setImageBitmap(bitmap);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
-                else finish();
+                } else finish();
                 break;
             default:
                 break;
@@ -174,18 +163,17 @@ public class PhotoWithWord extends TitleTravelRecord {
             String words = s.toString();
             setWords(words);
             setFilename(routefile);
-            if (words!="")
-            {
+            if (words != "") {
                 isPhotowithword(true);
                 showUploadView(true);
-            }
-            else {
+            } else {
                 showUploadView(false);
             }
         }
     };
+
     //根据时间命名照片
-    public String filename(){
+    public String filename() {
         //SimpleDateFormat timesdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //SimpleDateFormat filesdf = new SimpleDateFormat("yyyy-MM-dd HHmmss"); //文件名不能有：
         //String FileTime =timesdf.format(new Date()).toString();//获取系统时间
@@ -196,7 +184,7 @@ public class PhotoWithWord extends TitleTravelRecord {
         String HH = hour.format(new Date());
         String mm = minute.format(new Date());
         String ss = second.format(new Date());
-        String filename = HH+mm+ss;
+        String filename = HH + mm + ss;
         return filename;
         //MyTextView.setText("Time = "+java.nio.file.attribute.FileTime+"\nfile"+filename);
     }
