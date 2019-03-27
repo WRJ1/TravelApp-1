@@ -125,7 +125,7 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
                // MapsPath = Environment.getExternalStorageDirectory()+"/maps/"+ routefile + "--"+ stopLocation + ".png";
                 Log.e("Stoppath",MapsPath);
                screenShot(v);
-               // finish();
+               finish();
             }
         });
 
@@ -321,7 +321,7 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
                 e.printStackTrace();
             }
             if (b)
-                Toast.makeText(this, "截屏成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Your trip is finished! Upload successful!", Toast.LENGTH_SHORT).show();
             else {
                 Toast.makeText(this, "截屏失败", Toast.LENGTH_SHORT).show();
             }
