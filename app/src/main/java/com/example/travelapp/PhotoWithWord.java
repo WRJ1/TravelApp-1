@@ -19,6 +19,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,22 +30,22 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PhotoWithWord extends TitleTravelRecord {
-    protected OnCheckCameraPermission mOnCheckCameraPermission;
-    private OnCheckStoragePermission mOnCheckStoragePermission;
     private ImageView picture;
+    private EditText typewords;
     private File sdcardTempFile;
+    private String routefile;
+    private String photoPath;
     public static final int TAKE_PHOTO = 101;
-    protected final int PERMISSIONS_WRITE_STORAGE = 1;
-   public final int PERMISSIONS_CAMERA = 2;
 
     //接受前一个Intent传入的id
     private Bundle bundle;
     private int Show_Choice;
-    String photoPath = Environment.getExternalStorageDirectory().getPath() + "/pictures/myPhoto" + SystemClock.currentThreadTimeMillis() + ".jpg";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +53,25 @@ public class PhotoWithWord extends TitleTravelRecord {
         setContentView(R.layout.activity_photo_with_word);
         showTitleTextView(false);
         showBackwardView(true);
-        showUploadView(true);
-        picture = (ImageView) findViewById(R.id.img_photo);
+        showUploadView(false);
+
+        Intent intentroutefile = getIntent();
+        routefile = intentroutefile.getStringExtra("starttime");
+        setFilename(routefile);
+        Log.e("starttime",routefile);
+
+
+        photoPath = Environment.getExternalStorageDirectory().getPath() +"/pictures/"+routefile + "_" + filename() + ".jpg";
+        //文本框记录文字
+        typewords = (EditText) findViewById(R.id.edit_content);
+        typewords.addTextChangedListener(edit);
+
+        //调用相机并显示照片
+        picture   = (ImageView) findViewById(R.id.img_photo);
         bundle = this.getIntent().getExtras();
         Show_Choice = bundle.getInt("id");
 
+        //检查各项权限
         checkCameraPression(new OnCheckCameraPermission() {
             @Override
             public void onCheckCameraPression(boolean haspermission) {
@@ -72,7 +89,6 @@ public class PhotoWithWord extends TitleTravelRecord {
             }
         });
 
-
         //接收Intent传递的id值，并判断，照相功能为1，打开相册功能为2
         switch (Show_Choice) {
             //如果传递为TAKE_PHOTO
@@ -86,107 +102,12 @@ public class PhotoWithWord extends TitleTravelRecord {
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(sdcardTempFile));
                 }
                 startActivityForResult(intent, 101);
-                }
+            }
             break;
             default:
                 break;
         }
     }
-
-
-    /**
-     * android6.0动态权限申请：SD卡读写权限
-     **/
-    public void checkStoragePression(OnCheckStoragePermission callback) {
-        mOnCheckStoragePermission = callback;
-        if (Build.VERSION.SDK_INT >= 23) {
-            int checkCamerapression = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if (checkCamerapression != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS}, PERMISSIONS_WRITE_STORAGE);
-                return;
-            }
-            mOnCheckStoragePermission.onCheckStoragePression(true);
-            return;
-        }
-        mOnCheckStoragePermission.onCheckStoragePression(true);
-    }
-
-    /**
-     * android6.0动态权限申请：相机使用权限
-     **/
-    public void checkCameraPression(OnCheckCameraPermission callback) {
-        mOnCheckCameraPermission = callback;
-        if (Build.VERSION.SDK_INT >= 23) {
-            int checkCamerapression = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-            if (checkCamerapression != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_CAMERA);
-                return;
-            }
-            mOnCheckCameraPermission.onCheckCameraPression(true);
-            return;
-        }
-        mOnCheckCameraPermission.onCheckCameraPression(true);
-    }
-
-    /**
-     * 权限申请
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        boolean permit = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
-        switch (requestCode) {
-            case PERMISSIONS_CAMERA:
-                if (mOnCheckCameraPermission != null) {
-                    mOnCheckCameraPermission.onCheckCameraPression(permit);
-                }
-                break;
-            case PERMISSIONS_WRITE_STORAGE:
-                if (mOnCheckStoragePermission != null) {
-                    mOnCheckStoragePermission.onCheckStoragePression(permit);
-                }
-                break;
-            default:
-                break;
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    /**
-     * Uri 转 绝对路径
-     */
-    public static String getFilePathFromContentUri(Uri selectedVideoUri, ContentResolver contentResolver) {
-        String filePath;
-        String[] filePathColumn = {MediaStore.MediaColumns.DATA};
-        Cursor cursor = contentResolver.query(selectedVideoUri, filePathColumn, null, null, null);
-        //也可用下面的方法拿到cursor
-        //Cursor  cursor  =  this.context.managedQuery(selectedVideoUri,  filePathColumn,  null,  null,  null);
-        cursor.moveToFirst();
-        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-        filePath = cursor.getString(columnIndex);
-        cursor.close();
-        return filePath;
-    }
-
-    /**
-     * 读写SD卡权限申请后回调
-     **/
-    public interface OnCheckStoragePermission {
-        /**
-         * @param haspermission true 允许  false 拒绝
-         **/
-        void onCheckStoragePression(boolean haspermission);
-    }
-
-    /**
-     * 拍照权限申请后回调
-     **/
-    public interface OnCheckCameraPermission {
-        /**
-         * @param haspermission true 允许  false 拒绝
-         **/
-       void onCheckCameraPression(boolean haspermission);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //super.onActivityResult(requestCode, resultCode, data);
@@ -200,7 +121,7 @@ public class PhotoWithWord extends TitleTravelRecord {
                         final File newSdcardTempFile = new File(photoPath);
                         //FileInputStream inputStream = new FileInputStream(sdcardTempFile);
                         FileInputStream inputStream = new FileInputStream(newSdcardTempFile);
-
+                        Log.e("photoname",photoPath);
                         //显示照片
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         picture.setImageBitmap(bitmap);
@@ -208,6 +129,7 @@ public class PhotoWithWord extends TitleTravelRecord {
                         e.printStackTrace();
                     }
                 }
+                else finish();
                 break;
             default:
                 break;
@@ -235,6 +157,48 @@ public class PhotoWithWord extends TitleTravelRecord {
 
         }
 
+    }
+
+    //对文本框进行监听
+    private TextWatcher edit = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            String words = s.toString();
+            setWords(words);
+            setFilename(routefile);
+            if (words!="")
+            {
+                isPhotowithword(true);
+                showUploadView(true);
+            }
+            else {
+                showUploadView(false);
+            }
+        }
+    };
+    //根据时间命名照片
+    public String filename(){
+        //SimpleDateFormat timesdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //SimpleDateFormat filesdf = new SimpleDateFormat("yyyy-MM-dd HHmmss"); //文件名不能有：
+        //String FileTime =timesdf.format(new Date()).toString();//获取系统时间
+        //String filename = FileTime.replace(":", "");
+        SimpleDateFormat hour = new SimpleDateFormat("HH");//获取小时
+        SimpleDateFormat minute = new SimpleDateFormat("mm");//获取分钟
+        SimpleDateFormat second = new SimpleDateFormat("ss");//获取秒
+        String HH = hour.format(new Date());
+        String mm = minute.format(new Date());
+        String ss = second.format(new Date());
+        String filename = HH+mm+ss;
+        return filename;
+        //MyTextView.setText("Time = "+java.nio.file.attribute.FileTime+"\nfile"+filename);
     }
 
 }

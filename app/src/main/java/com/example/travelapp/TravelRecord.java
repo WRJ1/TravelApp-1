@@ -1,6 +1,9 @@
 package com.example.travelapp;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -9,13 +12,20 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TravelRecord extends TitleTravelRecord {
 
     private List<Record> recordList = new ArrayList<>();
+    private List<String> mMaps = new ArrayList<String>();
+    private List<String> mRecordDate = new ArrayList<String>();
+    private List<String> mRecordLocation = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,21 +45,20 @@ public class TravelRecord extends TitleTravelRecord {
 
         RecordAdapter adapter = new RecordAdapter(recordList);
         //添加Android自带的分割线
-        recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(adapter);
 
 
         adapter.setOnItemClickLitener(new RecordAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {
-                //String id = infoBeen.get(position).getId();
-                //String id = infoBeen.get(position).getId();
                 position = recyclerView.getChildAdapterPosition(view);
                 Intent intent;
                 switch (position) {
                     case 0:
                         //setContentView(R.layout.activity_travel_record_detail);
                         intent = new Intent(TravelRecord.this, TravelRecordDetail.class);
+                        //Log.e("TR","start");
                         startActivity(intent);
                         break;
                     case 1:
@@ -60,32 +69,70 @@ public class TravelRecord extends TitleTravelRecord {
                 }
             }
         });
-        /*adapter.setItemClickListener(new OnRecyclerViewClickListener() {
-            @Override
-            public void onItemClickListener(View view) {
-                int position = recyclerView.getChildAdapterPosition(view);
-                switch (position) {
-                    case 0:
-                        setContentView(R.layout.activity_travel_record_detail);
-                        break;
-                    case 1:
-                        setContentView(R.layout.activity_travel_record_detail);
-                        break;
-                }
-            }
-
-            @Override
-            public void onItemLongClickListener(View view) {
-
-            }
-        });*/
-        }
-
-    private void initRecords(){
-            Record r1 = new Record("2018/03/19", "CQU-HongyaCave");
-            recordList.add(r1);
-            Record r2 = new Record("2018/03/20", "CQU-SFAI");
-            recordList.add(r2);
     }
 
+    private void initRecords() {
+        /*(mMaps = getMapsPathFromSD();
+        for (int i = 0; i < mMaps.size(); i++) {
+            String map = mMaps.get(i);
+            String date = map.substring(20, 29);
+            mRecordDate.add(date);
+            String location = map.substring(38, map.indexOf(".") - 1);
+            mRecordLocation.add(location);
+        }*/
+       /* String date;
+        String location;
+        for (int i = 0; i < mMaps.size(); i++) {
+            date = mRecordDate.get(i);
+            location = mRecordLocation.get(i);
+            Record record = new Record(date, location);
+            recordList.add(record);
+        }*/
+       Record r1 = new Record("2018/03/19", "CQU-HongyaCave");
+        recordList.add(r1);
+        Record r2 = new Record("2018/03/20", "CQU-SFAI");
+        recordList.add(r2);
+    }
+
+    /**
+     * 从sd卡获取地图截屏文件资源
+     *
+     * @return
+     */
+    public List<String> getMapsPathFromSD() {
+        List<String> mapsPathList = new ArrayList<String>();
+        String mapsPath = Environment.getExternalStorageDirectory().getPath()+ "/pictures";
+        File fileAll=new File(mapsPath);
+        File[] files=fileAll.listFiles();
+        if (files == null){
+            Log.e("error","空目录");return null;}
+        // 将所有的文件存入ArrayList中,并过滤所有图片格式的文件
+        for (int i = 0; i < files.length; i++) {
+            File file = files[i];
+            if (checkIsMapsFile(file.getPath())){
+                mapsPathList.add(file.getPath());
+            }
+        }
+        return mapsPathList;
+    }
+
+    /**
+     * 检查扩展名，得到png格式的文件
+     *
+     * @param fName 文件名
+     * @return
+     */
+    @SuppressLint("DefaultLocale")
+    private boolean checkIsMapsFile(String fName) {
+        boolean isMapFile = false;
+        // 获取扩展名
+        String FileEnd = fName.substring(fName.lastIndexOf(".") + 1,
+                fName.length()).toLowerCase();
+        if (FileEnd.equals("png")) {
+            isMapFile = true;
+        } else {
+            isMapFile = false;
+        }
+        return isMapFile;
+    }
 }

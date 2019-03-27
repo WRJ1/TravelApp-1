@@ -5,4 +5,7 @@
     <color name="colorAccent">#D81B60</color>
     <color name="titlebar">#FF6908</color>
     <color name="buttoncolor">#FAE59C</color>
+    <color name="framecolor">#0A9DFF</color>
+    <color name="lineclickcolor">#C7CEB2</color>
+    <color name="blank">#FFFFFF</color>
 </resources>

@@ -8,10 +8,12 @@
 
     <ImageView
         android:id="@+id/img_photo"
-        android:layout_width="423dp"
+        android:layout_width="403dp"
         android:layout_height="375dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -22,21 +24,23 @@
 
     <EditText
         android:id="@+id/edit_content"
-        android:layout_width="395dp"
-        android:layout_height="174dp"
+        android:layout_width="378dp"
+        android:layout_height="122dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
+        android:background="@drawable/frame"
         android:ems="10"
+        android:gravity="top"
+        android:hint="Record your feel"
         android:inputType="textPersonName"
-        android:text="Add content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/img_photo"
-        app:layout_constraintVertical_bias="0.086" />
+        app:layout_constraintVertical_bias="0.099" />
 </android.support.constraint.ConstraintLayout>

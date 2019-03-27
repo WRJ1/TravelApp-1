@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable = "@mipmap/playon1"
+        android:state_focused="true">
+    </item>
+
+    <item android:drawable = "@mipmap/playon"
+        android:state_pressed="true">
+    </item>
+
+    <item
+        android:drawable = "@mipmap/playon1" >
+    </item>
+</selector>

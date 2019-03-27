@@ -2,69 +2,50 @@ package com.example.travelapp;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.location.Location;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-
-import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps2d.AMap;
 import com.amap.api.maps2d.CameraUpdateFactory;
 import com.amap.api.maps2d.LocationSource;
 import com.amap.api.maps2d.MapView;
-
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps2d.UiSettings;
-import com.amap.api.maps2d.model.BitmapDescriptorFactory;
 import com.amap.api.maps2d.model.LatLng;
-import com.amap.api.maps2d.model.MarkerOptions;
 import com.amap.api.maps2d.model.MyLocationStyle;
-import com.amap.api.maps2d.LocationSource;
-import com.amap.api.maps.LocationSource.OnLocationChangedListener;
-import com.amap.api.maps2d.model.Polygon;
-import com.amap.api.maps2d.model.Polyline;
 import com.amap.api.maps2d.model.PolylineOptions;
-import com.amap.api.maps2d.model.PolygonOptions;
 import com.amap.api.maps2d.AMap.OnMapScreenShotListener;
-import com.bumptech.glide.util.Util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-public class Stop extends AppCompatActivity implements LocationSource,AMapLocationListener,OnMapScreenShotListener {
+public class Stop extends AppCompatActivity implements LocationSource, AMapLocationListener,OnMapScreenShotListener {
 
     public static final int TAKE_PHOTO = 101;
     private Button camera;
     private Button words;
     private Button stop;
+    private String routefile;
+    private String stopLocation;
+    private String MapsPath;
     private AMap aMap;
     private MapView mapView;
+
     //以前的定位点
     private LatLng oldLatLnog;
     private boolean isFirstLoc;
@@ -78,9 +59,14 @@ public class Stop extends AppCompatActivity implements LocationSource,AMapLocati
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stop);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
+        if(actionBar != null){
             actionBar.hide();
         }
+        //获取起始时间
+        Intent intentroutefile = getIntent();
+        routefile = intentroutefile.getStringExtra("routefiletocamera");
+        Log.e("Stop",routefile);
+
         //显示地图
         mapView = (MapView) findViewById(R.id.map);
         //必须要写
@@ -99,13 +85,14 @@ public class Stop extends AppCompatActivity implements LocationSource,AMapLocati
         }
         isFirstLoc = true;
         location();
-        camera = (Button) findViewById(R.id.btn_camera);
+
+        camera = (Button)findViewById(R.id.btn_camera);
         camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClass(Stop.this, PhotoWithWord.class);//也可以这样写intent.setClass(MainActivity.this, OtherActivity.class);
-
+                intent.setClass(Stop.this, PhotoWithWord.class);
+                intent.putExtra("starttime",routefile);
                 Bundle bundle = new Bundle();
                 bundle.putInt("id", TAKE_PHOTO);//使用显式Intent传递参数，用以区分功能
                 intent.putExtras(bundle);
@@ -113,27 +100,41 @@ public class Stop extends AppCompatActivity implements LocationSource,AMapLocati
                 Stop.this.startActivity(intent);//启动新的Intent
             }
         });
-        words = (Button) findViewById(R.id.btn_edit);
+        words = (Button)findViewById(R.id.btn_edit);
         words.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setClass(Stop.this, Words.class);
-                Stop.this.startActivity(intent);//启动新的Intent
+                intent.putExtra("starttime",routefile);
+                Stop.this.startActivity(intent);//启动新的Intent，
             }
         });
-        stop=(Button)findViewById(R.id.btn_stop);
+        stop = (Button)findViewById(R.id.btn_stop);
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                screenShot(v);
+                /*//记录路程结束时间
+                SimpleDateFormat timesdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String FileTime =timesdf.format(new Date()).toString();//获取系统时间
+                String stoptime = FileTime.replace(":", "");
+                Intent stoptimeintent = new Intent();
+                stoptimeintent.putExtra("stoptime",stoptime);*/
+               Log.e("StopL",stopLocation);
+                MapsPath = Environment.getExternalStorageDirectory() + "/"+ routefile + "--"+ stopLocation  + ".png";
+               // MapsPath = Environment.getExternalStorageDirectory()+"/maps/"+ routefile + "--"+ stopLocation + ".png";
+                Log.e("Stoppath",MapsPath);
+               screenShot(v);
+               // finish();
             }
-
         });
 
     }
-    public void screenShot(View v){
-        aMap.getMapScreenShot(this); }
+
+   public void screenShot(View v){
+      aMap.getMapScreenShot(this);
+      Log.e("screenshot",MapsPath);
+   }
 
     private void location() {
         //初始化定位
@@ -159,7 +160,6 @@ public class Stop extends AppCompatActivity implements LocationSource,AMapLocati
         //启动定位
         mLocationClient.startLocation();
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -182,7 +182,6 @@ public class Stop extends AppCompatActivity implements LocationSource,AMapLocati
         //在activity执行onPause时执行mMapView.onPause ()，实现地图生命周期管理
         mapView.onPause();
     }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -241,6 +240,7 @@ public class Stop extends AppCompatActivity implements LocationSource,AMapLocati
                     Toast.makeText(getApplicationContext(), buffer.toString(), Toast.LENGTH_LONG).show();
                     isFirstLoc = false;
                 }
+               stopLocation = aMapLocation.getStreet();
                 if (oldLatLnog != newLatLng) {
                     Log.e("Amap", aMapLocation.getLatitude() + "," + aMapLocation.getLongitude());
                     setUpMap(oldLatLnog, newLatLng);
@@ -256,7 +256,6 @@ public class Stop extends AppCompatActivity implements LocationSource,AMapLocati
             }
         }
     }
-
 
     @Override
     public void activate(OnLocationChangedListener onLocationChangedListener) {
@@ -303,15 +302,13 @@ public class Stop extends AppCompatActivity implements LocationSource,AMapLocati
                 .geodesic(true).color(Color.BLUE));
 
     }
-
     @Override
     public void onMapScreenShot(Bitmap bitmap) {
-        // TODO Auto-generated method stub
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         try {
             // 保存在SD卡根目录下，图片为png格式。
-            FileOutputStream fos = new FileOutputStream(
-                    Environment.getExternalStorageDirectory() + "/test_" + sdf.format(new Date()) + ".png");
+            FileOutputStream fos = new FileOutputStream(MapsPath);
+            Log.e("shotsuccessful",MapsPath);
             boolean b = bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             try {
                 fos.flush();

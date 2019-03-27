@@ -16,33 +16,28 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.location.Location;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.util.Map;
-
-
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.CameraUpdateFactory;
-import com.amap.api.maps2d.LocationSource;
-import com.amap.api.maps2d.MapView;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
-import com.amap.api.maps2d.UiSettings;
-import com.amap.api.maps2d.model.BitmapDescriptorFactory;
-import com.amap.api.maps2d.model.LatLng;
-import com.amap.api.maps2d.model.MarkerOptions;
-import com.amap.api.maps2d.model.MyLocationStyle;
+import com.amap.api.maps2d.AMap;
+import com.amap.api.maps2d.CameraUpdateFactory;
 import com.amap.api.maps2d.LocationSource;
-import com.amap.api.maps.LocationSource.OnLocationChangedListener;
+import com.amap.api.maps2d.MapView;
+import com.amap.api.maps2d.UiSettings;
+import com.amap.api.maps2d.model.LatLng;
+import com.amap.api.maps2d.model.MyLocationStyle;
 
-public class Start extends AppCompatActivity implements LocationSource,AMapLocationListener{
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class Start extends AppCompatActivity implements LocationSource, AMapLocationListener {
     private Button btnStart;
     private MapView mapView;//地图控件
     private AMap aMap;//地图对象
+    private String startLocation;
+
 
     private static final int LOCATION_CODE = 1;
     private LocationManager lm;//【位置管理】
@@ -54,7 +49,6 @@ public class Start extends AppCompatActivity implements LocationSource,AMapLocat
     //标识，用于判断是否只显示一次定位信息和用户重新定位
     private boolean isFirstLoc = true;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +57,7 @@ public class Start extends AppCompatActivity implements LocationSource,AMapLocat
         if(actionBar != null){
             actionBar.hide();
         }
+
         //显示地图
         mapView = (MapView) findViewById(R.id.map);
         //必须要写
@@ -81,17 +76,27 @@ public class Start extends AppCompatActivity implements LocationSource,AMapLocat
         location();
         //获得权限
         quanxian();
+
         btnStart = (Button)findViewById(R.id.btn_Start);
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(Start.this,"Start route",Toast.LENGTH_SHORT).show();
+                //记录路程开始时间
+                SimpleDateFormat timesdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String FileTime =timesdf.format(new Date()).toString();//获取系统时间
+                String filename = FileTime.replace(":", "");
+                filename = filename+"_"+startLocation;
+                Log.e("filenameinstart",filename);
+
                 Intent intent=new Intent(Start.this,Stop.class);
+                intent.putExtra("routefiletocamera",filename);
                 startActivity(intent);
-                //finish();
+                finish();
             }
         });
     }
+
     //获取权限
     public void quanxian(){
         lm = (LocationManager) Start.this.getSystemService(Start.this.LOCATION_SERVICE);
@@ -118,6 +123,7 @@ public class Start extends AppCompatActivity implements LocationSource,AMapLocat
             startActivityForResult(intent, 1315);
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -134,6 +140,7 @@ public class Start extends AppCompatActivity implements LocationSource,AMapLocat
             }
         }
     }
+
     private void location() {
         //初始化定位
         mLocationClient = new AMapLocationClient(getApplicationContext());
@@ -237,6 +244,7 @@ public class Start extends AppCompatActivity implements LocationSource,AMapLocat
                             + aMapLocation.getStreet() + ""
                             + aMapLocation.getStreetNum());
                     Toast.makeText(getApplicationContext(), buffer.toString(), Toast.LENGTH_LONG).show();
+                    startLocation = aMapLocation.getStreet();
                     isFirstLoc = false;
                 }
 
@@ -250,7 +258,6 @@ public class Start extends AppCompatActivity implements LocationSource,AMapLocat
             }
         }
     }
-
 
     @Override
     public void activate(OnLocationChangedListener onLocationChangedListener) {
