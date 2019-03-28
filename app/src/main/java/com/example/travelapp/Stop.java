@@ -1,10 +1,14 @@
 package com.example.travelapp;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -26,8 +30,12 @@ import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.MyLocationStyle;
 import com.amap.api.maps2d.model.PolylineOptions;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -47,6 +55,7 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
     //以前的定位点
     private LatLng oldLatLnog;
     private boolean isFirstLoc;
+    private String starttime;
     private OnLocationChangedListener mListener = null;
     private AMapLocationClient mLocationClient = null;
     private AMapLocationClientOption mLocationOption = null;
@@ -63,7 +72,9 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
         //获取起始时间
         Intent intentroutefile = getIntent();
         routefile = intentroutefile.getStringExtra("routefiletocamera");
-        Log.e("Stop",routefile);
+        Log.e("Stop","get"+routefile);
+        starttime = routefile.substring(0,routefile.indexOf("_"));
+
 
         //显示地图
         mapView = (MapView) findViewById(R.id.map);
@@ -105,6 +116,75 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
                 Intent intent = new Intent();
                 intent.setClass(Stop.this, Words.class);
                 intent.putExtra("starttime",routefile);
+                /*try {
+                    if (ExternalStorageUtil.isExternalStorageMounted()) {
+
+                        // Check whether this app has write external storage permission or not.
+                        int writeExternalStoragePermission = ContextCompat.checkSelfPermission(Stop.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                        // If do not grant write external storage permission.
+                        if (writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
+                            // Request user to grant write external storage permission.
+                            ActivityCompat.requestPermissions(Stop.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 119);
+                        } else {
+
+                            // Specify the directory to use
+                            //String publicDirectory = ExternalStorageUtil.getPublicExternalStorageBaseDir(Environment.DIRECTORY_DCIM);
+                            String Wordsfile = Environment.getExternalStorageDirectory().getPath() + "/Words";
+                            File words = new File(Wordsfile);
+                            if (words.exists()) {
+                                String publicDirectory = ExternalStorageUtil.getPublicExternalStorageBaseDir(Environment.getRootDirectory().getPath());
+                                Log.e("TAG", publicDirectory);
+                                File fileAll = new File(publicDirectory);
+                                //Get the list of the files in this directory
+                                File[] files = fileAll.listFiles();
+                                for (File file : files) {
+                                    Log.e("TAG", "File found: " + file.getName());
+                                }
+                                //Write a new file in this directory
+                                String fileName = "my_file.txt";
+                                File newFile = new File(publicDirectory, fileName);
+                                FileWriter fw = new FileWriter(newFile);
+                                fw.write("Insert this text");
+                                fw.flush();
+                                fw.close();
+                                Log.e("TAG", "Saved: " + newFile.getAbsolutePath());*/
+
+                                /**
+                                 * Read the file content
+                                 */
+
+                                // Get The Text file
+                                /*File textFileToRead = new File(publicDirectory, fileName);
+
+                                // Read the file Contents in a StringBuilder Object (handling long string content)
+                                StringBuilder content = new StringBuilder();
+                                try {
+                                    BufferedReader reader = new BufferedReader(new FileReader(textFileToRead));
+                                    String line;
+                                    while ((line = reader.readLine()) != null) {
+                                        content.append(line + '\n');
+                                    }
+                                    reader.close();
+                                    Log.e("TAG", "Content: " + content);
+
+                                } catch (IOException e) {
+                                    Log.e("TAG", "Error reading the file requested.");
+
+                                }
+                            }else {
+                                //若不存在，创建目录，可以在应用启动的时候创建
+                                words.mkdirs();
+                                setTitle("paht ok,path:"+Wordsfile);
+                                Log.e("Stop","create file successful"+Wordsfile);
+                            }
+                        }
+                    }
+
+                    }catch(Exception ex)
+                    {
+                        Log.e("TAG", "Error: " + ex.getMessage(), ex);
+
+                    }*/
                 Stop.this.startActivity(intent);//启动新的Intent，
             }
         });
@@ -118,11 +198,14 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
                 String stoptime = FileTime.replace(":", "");
                 Intent stoptimeintent = new Intent();
                 stoptimeintent.putExtra("stoptime",stoptime);*/
+                Intent intent=new Intent(Stop.this,UploadSuccessful.class);
+                intent.putExtra("starttime",starttime);
                Log.e("StopL",stopLocation);
                 MapsPath = Environment.getExternalStorageDirectory() + "/"+ routefile + "--"+ stopLocation  + ".png";
                // MapsPath = Environment.getExternalStorageDirectory()+"/maps/"+ routefile + "--"+ stopLocation + ".png";
                 Log.e("Stoppath",MapsPath);
                screenShot(v);
+               startActivity(intent);
                finish();
             }
         });

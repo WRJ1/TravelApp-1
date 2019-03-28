@@ -2,6 +2,7 @@ package com.example.travelapp;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,9 +34,11 @@ public class TravelRecordDetail extends TitleTravelRecord {
 
     private ImageView imgMap;
     private List<RecordDetail> recordDetailList = new ArrayList<>();
-    private List<RecordDetail> mRecord = new ArrayList<>();
-    private List<String> mRecordPhoto = new ArrayList<>();
+    private List<String> mRecordMap = new ArrayList<>();
+    private List<String> mRecordPhotos = new ArrayList<>();
     private List<String> mRecordWords = new ArrayList<>();
+    private String routetime;
+    private int onlywords = 0;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
@@ -47,8 +52,14 @@ public class TravelRecordDetail extends TitleTravelRecord {
         showBackwardView(true);
         showUploadView(false);
 
+        //获取路线时间
+        Intent intentroutefile = getIntent();
+        routetime = intentroutefile.getStringExtra("routetime");
+        Log.e("TRD_getrouteTime",routetime);
         imgMap = (ImageView)findViewById(R.id.img_map);
-        initRecordDetail();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            initRecordDetail();
+        }
         RecyclerView recyclerView=(RecyclerView)findViewById(R.id.recycler_view);
         StaggeredGridLayoutManager layoutManager=new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -61,19 +72,45 @@ public class TravelRecordDetail extends TitleTravelRecord {
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void initRecordDetail() {
 
+        getMapsPathFromSD();
         mRecordWords = getWordsPathFromSD();
-        mRecordPhoto = getImagePathFromSD();
-        String photodescribe;
+        mRecordPhotos = getImagePathFromSD();
+        String photodescribe="",photoid="";
         int length;
-       // if (mRecordWords.size()>mRecordPhoto.size()){
+       /* if (mRecordWords.size()>mRecordPhotos.size()){
             length = mRecordWords.size();
-      //  }else length = mRecordPhoto.size();
+            Log.e("lengthw",String.valueOf(length));
+       }else {
+            length = mRecordPhotos.size();
+             Log.e("length", String.valueOf(length));
+        }*/
+       length = onlywords+mRecordPhotos.size();
+        int p = 0;
         for (int i = 0; i < length; i++) {
-            photodescribe = readFileOnLine(mRecordWords.get(i));
-            String photoid = mRecordPhoto.get(i);
-            RecordDetail view = new RecordDetail(photodescribe, photoid);
-            Log.e("Words_descripe", mRecordWords.get(i) + photodescribe);
-            recordDetailList.add(view);
+            if (mRecordPhotos.size()<= p ){
+                photoid = "";
+                Log.e("TRD","no photots");
+            }else if (mRecordWords.size()<=i){
+                photodescribe = "";
+                Log.e("TRD","no words");
+            }
+            if(p<mRecordPhotos.size()) {
+                photoid = mRecordPhotos.get(p);
+            }
+            if (i<mRecordWords.size()) {
+                photodescribe = readFileOnLine(mRecordWords.get(i));
+                String wordspath = mRecordWords.get(i);
+                if( wordspath.indexOf("myWords") != -1){
+                    photoid = "";
+                    p--;
+                    Log.e("TRD_ONLYWORDS","i:"+String.valueOf(i)+"p"+String.valueOf(p));
+                }
+            }
+                RecordDetail view = new RecordDetail(photodescribe, photoid);
+                //Log.e("Words_descripe", mRecordWords.get(i) + photodescribe);
+                recordDetailList.add(view);
+
+            p++;
         }
         /*for (int i = 0 ; i < Images.imageUrls.length ; i++){
             String data = Images.imageUrls[i];
@@ -99,6 +136,55 @@ public class TravelRecordDetail extends TitleTravelRecord {
     }
 
     /**
+     * 从sd卡获取地图截屏文件资源
+     *
+     * @return
+     */
+    public void getMapsPathFromSD() {
+        //List<String> mapsPathList = new ArrayList<String>();
+        String mapsPath = Environment.getExternalStorageDirectory().getPath();
+        File fileAll=new File(mapsPath);
+        File[] files=fileAll.listFiles();
+        if (files == null){
+            Log.e("error","空目录");}
+        // 将所有的文件存入ArrayList中,并过滤所有图片格式的文件
+        for (int i = 0; i < files.length; i++) {
+            File file = files[i];
+            String routes = file.getPath();
+            if (checkIsMapsFile(routes)) {
+                //mapsPathList.add(file.getPath());
+                Log.e("TRD_MAP_READroute", routes);
+                String timeroutes = routes.substring(20, routes.indexOf("_"));
+                Log.e("TRD_MAP_READtimerouts",timeroutes);
+                if ((timeroutes.equals(routetime))) {
+                    Log.e("TRD_MAP_MATCH",routes);
+                    Glide.with(this).load(routes).centerCrop().into(imgMap);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 检查扩展名，得到png格式的文件
+     *
+     * @param fName 文件名
+     * @return
+     */
+    @SuppressLint("DefaultLocale")
+    private boolean checkIsMapsFile(String fName) {
+        boolean isMapFile = false;
+        // 获取扩展名
+        String FileEnd = fName.substring(fName.lastIndexOf(".") + 1,
+                fName.length()).toLowerCase();
+        if (FileEnd.equals("png")) {
+            isMapFile = true;
+        } else {
+            isMapFile = false;
+        }
+        return isMapFile;
+    }
+    /**
      * 从sd卡获取图片资源
      * @return
      */
@@ -107,20 +193,27 @@ public class TravelRecordDetail extends TitleTravelRecord {
         List<String> imagePathList = new ArrayList<String>();
         // 得到sd卡内image文件夹的路径   File.separator(/)
             String photosPath = Environment.getExternalStorageDirectory().getPath()+"/pictures";
-            Log.e("TRD", "read files" + photosPath);
-            Log.e("TRD", Environment.getExternalStorageDirectory().getAbsolutePath() );
+            Log.e("TRD_PHOTO_photopath", photosPath);
+            //Log.e("TRD", Environment.getExternalStorageDirectory().getAbsolutePath() );
             // 得到该路径文件夹下所有的文件
             File fileAll = new File(photosPath);
             File[] files = fileAll.listFiles();
             // 将所有的文件存入ArrayList中,并过滤所有图片格式的文件
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
-                if (!files[i].isDirectory()) {
+                /*if (!files[i].isDirectory()) {
                     String filename = files[i].getName();
-                    Log.e("file name", filename);
-                }
+                    Log.e("TRD_PHOTO_file_name", filename);
+                }*/
+                String routes = file.getPath();
                 if (checkIsImageFile(file.getPath())) {
-                    imagePathList.add(file.getPath());
+                    Log.e("TRD_PHOTO_READroute", routes);
+                    String timeroutes = routes.substring(29, routes.indexOf("_"));
+                    Log.e("TRD_PHOTO_READtimeroute",timeroutes);
+                    if ((timeroutes.equals(routetime))) {
+                        Log.e("TRD_PICTURES_MATCH",routes);
+                        imagePathList.add(file.getPath());
+                    }
                 }
             }
         // 返回得到的图片列表
@@ -147,7 +240,7 @@ public class TravelRecordDetail extends TitleTravelRecord {
          * START
          */
 
-        try {
+       /* try {
             if(ExternalStorageUtil.isExternalStorageMounted()) {
 
                 // Check whether this app has write external storage permission or not.
@@ -160,8 +253,8 @@ public class TravelRecordDetail extends TitleTravelRecord {
                 }else {
 
                     // Specify the directory to use
-                    String publicDirectory = ExternalStorageUtil.getPublicExternalStorageBaseDir(Environment.DIRECTORY_DCIM);
-
+                    //String publicDirectory = ExternalStorageUtil.getPublicExternalStorageBaseDir(Environment.DIRECTORY_DCIM);
+                    String publicDirectory = ExternalStorageUtil.getPublicExternalStorageBaseDir(Environment.getExternalStorageDirectory().getPath());
                     File fileAll = new File(publicDirectory);
                     //Get the list of the files in this directory
                     File[] files=fileAll.listFiles();
@@ -175,14 +268,14 @@ public class TravelRecordDetail extends TitleTravelRecord {
                     fw.write("Insert this text");
                     fw.flush();
                     fw.close();
-                    Log.e("TAG", "Saved: "+ newFile.getAbsolutePath());
+                    Log.e("TAG", "Saved: "+ newFile.getAbsolutePath());*/
 
                     /**
                      * Read the file content
                      */
 
                     // Get The Text file
-                    File textFileToRead = new File(publicDirectory, fileName);
+                   /* File textFileToRead = new File(publicDirectory, fileName);
 
                     // Read the file Contents in a StringBuilder Object (handling long string content)
                     StringBuilder content = new StringBuilder();
@@ -209,28 +302,39 @@ public class TravelRecordDetail extends TitleTravelRecord {
         {
             Log.e("TAG", "Error: "+ex.getMessage(), ex);
 
-        }
+        }*/
 
 
         /***
          * END
          */
-//        String wordsPath = Environment.getExternalStorageDirectory().getPath() + "/Pictures/";
-//
-//        Log.e("TRD","read files"+wordsPath);
-//        File fileAll=new File(wordsPath);
-//        File[] files=fileAll.listFiles();
-//        if (files == null){
-//            Log.e("error","空目录");return null;}
-//         //将所有的文件存入ArrayList中,并过滤所有图片格式的文件
-//        for (int i = 0; i < files.length; i++) {
-//            File file = files[i];
-//            if (checkIsWordsFile(file.getPath())){
-//                wordsPathList.add(file.getPath());
-//            }
-//        }
-//        return wordsPathList;
-        return null;
+       String wordsPath = Environment.getExternalStorageDirectory().getPath() + "/Words/";
+
+       Log.e("TRD_WORD_wordspath",wordsPath);
+       File fileAll=new File(wordsPath);
+       File[] files=fileAll.listFiles();
+       if (files == null){
+           Log.e("error","空目录");return null;}
+         //将所有的文件存入ArrayList中,并过滤所有图片格式的文件
+        for (int i = 0; i < files.length; i++) {
+            File file = files[i];
+            String routes = file.getPath();
+           if (checkIsWordsFile(file.getPath())){
+               Log.e("TRD_WORD_READroute", routes);
+               String timeroutes = routes.substring(26, routes.indexOf("_"));
+               Log.e("TRD_WORD_READtimeroute",timeroutes);
+               if ((timeroutes.equals(routetime))) {
+                   Log.e("TRD_WORDS_MATCH",routes);
+                   if( routes.indexOf("myWords") != -1){
+                       onlywords++;
+                   }
+                   Log.e("TRD_ONLYWORDS",String.valueOf(onlywords));
+                   wordsPathList.add(file.getPath());
+               }
+           }
+        }
+       return wordsPathList;
+       // return null;
     }
     /**
      * 检查扩展名，得到图片格式的文件
@@ -243,8 +347,7 @@ public class TravelRecordDetail extends TitleTravelRecord {
         // 获取扩展名
         String FileEnd = fName.substring(fName.lastIndexOf(".") + 1,
                 fName.length()).toLowerCase();
-        if (FileEnd.equals("jpg") || FileEnd.equals("png") || FileEnd.equals("gif")
-                || FileEnd.equals("jpeg")|| FileEnd.equals("bmp") ) {
+        if (FileEnd.equals("jpg")) {
             isImageFile = true;
         } else {
             isImageFile = false;
