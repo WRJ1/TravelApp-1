@@ -2,21 +2,15 @@ package com.example.travelapp;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +48,7 @@ public class TravelRecord extends TitleTravelRecord {
             public void onItemClick(View view, int position) {
                 position = recyclerView.getChildAdapterPosition(view);
                 Intent intent;
-                switch (position) {
+               /* switch (position) {
                     case 0:
                         //setContentView(R.layout.activity_travel_record_detail);
                         intent = new Intent(TravelRecord.this, TravelRecordDetail.class);
@@ -66,32 +60,40 @@ public class TravelRecord extends TitleTravelRecord {
                         intent = new Intent(TravelRecord.this, TravelRecordDetail.class);
                         startActivity(intent);
                         break;
-                }
+                }*/
+                intent = new Intent(TravelRecord.this, TravelRecordDetail.class);
+                String map = mMaps.get(position);
+                Log.e("TR_route_press",map);
+                String time = map.substring(20, map.indexOf("_"));
+                intent.putExtra("routetime",time);
+                startActivity(intent);
             }
         });
     }
 
     private void initRecords() {
-        /*(mMaps = getMapsPathFromSD();
+        mMaps = getMapsPathFromSD();
         for (int i = 0; i < mMaps.size(); i++) {
             String map = mMaps.get(i);
-            String date = map.substring(20, 29);
+            Log.e("map",map);
+            String date = map.substring(20, map.indexOf("_"));
+            Log.e("date",date);
             mRecordDate.add(date);
-            String location = map.substring(38, map.indexOf(".") - 1);
+            String location = map.substring(38, map.indexOf("."));
             mRecordLocation.add(location);
-        }*/
-       /* String date;
+        }
+        String date;
         String location;
         for (int i = 0; i < mMaps.size(); i++) {
             date = mRecordDate.get(i);
             location = mRecordLocation.get(i);
             Record record = new Record(date, location);
             recordList.add(record);
-        }*/
-       Record r1 = new Record("2018/03/19", "CQU-HongyaCave");
+        }
+       /*Record r1 = new Record("2018/03/19", "CQU-HongyaCave");
         recordList.add(r1);
         Record r2 = new Record("2018/03/20", "CQU-SFAI");
-        recordList.add(r2);
+        recordList.add(r2);*/
     }
 
     /**
@@ -101,7 +103,7 @@ public class TravelRecord extends TitleTravelRecord {
      */
     public List<String> getMapsPathFromSD() {
         List<String> mapsPathList = new ArrayList<String>();
-        String mapsPath = Environment.getExternalStorageDirectory().getPath()+ "/pictures";
+        String mapsPath = Environment.getExternalStorageDirectory().getPath();
         File fileAll=new File(mapsPath);
         File[] files=fileAll.listFiles();
         if (files == null){

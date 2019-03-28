@@ -1,25 +1,23 @@
 package com.example.travelapp;
 
-import android.content.Context;
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Toast;
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.LocationSource;
-import com.amap.api.maps2d.MapView;
 
-import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
-import com.amap.api.maps2d.UiSettings;
+import com.amap.api.maps2d.AMap;
+import com.amap.api.maps2d.MapView;
 
 public class MainActivity extends AppCompatActivity{
     private Button btnStart;
@@ -40,12 +38,14 @@ public class MainActivity extends AppCompatActivity{
         if (actionbar != null){
             actionbar.hide();
         }
+        //Todo: load the map
         //显示地图
         mapView = (MapView) findViewById(R.id.map);
         //必须要写
-        mapView.onCreate(savedInstanceState);
+       mapView.onCreate(savedInstanceState);
         //获取地图对象
-        aMap = mapView.getMap();
+
+        //aMap = mapView.getMap();
         Button titleHistory = (Button)findViewById(R.id.title_history);
         Button titleNewRoute = (Button)findViewById(R.id.title_newroute);
 
@@ -53,8 +53,25 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this,"History",Toast.LENGTH_SHORT).show();
-                Intent intent=new Intent(MainActivity.this,TravelRecord.class);
-                startActivity(intent);
+                try {
+                    if (ExternalStorageUtil.isExternalStorageMounted()) {
+
+                        // Check whether this app has write external storage permission or not.
+                        int writeExternalStoragePermission = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                        // If do not grant write external storage permission.
+                        if (writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
+                            // Request user to grant write external storage permission.
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 119);
+                        } else {
+                            Intent intent=new Intent(MainActivity.this,TravelRecord.class);
+                            startActivity(intent);
+                        } }
+
+                }catch(Exception ex)
+                {
+                    Log.e("TAG", "Error: " + ex.getMessage(), ex);
+
+                }
                 //finish();
 
             }

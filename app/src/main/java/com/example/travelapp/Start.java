@@ -4,17 +4,17 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.os.Bundle;
+import android.os.Environment;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
@@ -29,6 +29,11 @@ import com.amap.api.maps2d.UiSettings;
 import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.MyLocationStyle;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -88,6 +93,77 @@ public class Start extends AppCompatActivity implements LocationSource, AMapLoca
                 String filename = FileTime.replace(":", "");
                 filename = filename+"_"+startLocation;
                 Log.e("filenameinstart",filename);
+
+                try {
+                    if (ExternalStorageUtil.isExternalStorageMounted()) {
+
+                        // Check whether this app has write external storage permission or not.
+                        int writeExternalStoragePermission = ContextCompat.checkSelfPermission(Start.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                        // If do not grant write external storage permission.
+                        if (writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
+                            // Request user to grant write external storage permission.
+                            ActivityCompat.requestPermissions(Start.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 119);
+                        } else {
+
+                            // Specify the directory to use
+                            //String publicDirectory = ExternalStorageUtil.getPublicExternalStorageBaseDir(Environment.DIRECTORY_DCIM);
+                            String Wordsfile = Environment.getExternalStorageDirectory().getPath() + "/Words";
+                            File words = new File(Wordsfile);
+                            if (words.exists()) {
+                                //String publicDirectory = ExternalStorageUtil.getPublicExternalStorageBaseDir(Environment.getRootDirectory().getPath());
+                                String publicDirectory = Wordsfile;
+                                Log.e("TAG", publicDirectory);
+                                File fileAll = new File(publicDirectory);
+                                //Get the list of the files in this directory
+                                File[] files = fileAll.listFiles();
+                                for (File file : files) {
+                                    Log.e("TAG", "File found: " + file.getName());
+                                }
+                                //Write a new file in this directory
+                                String fileName = "my_file.txt";
+                                File newFile = new File(publicDirectory, fileName);
+                                FileWriter fw = new FileWriter(newFile);
+                                fw.write("Insert this text");
+                                fw.flush();
+                                fw.close();
+                                Log.e("TAG", "Saved: " + newFile.getAbsolutePath());
+
+                                /**
+                                 * Read the file content
+                                 */
+
+                                // Get The Text file
+                                File textFileToRead = new File(publicDirectory, fileName);
+
+                                // Read the file Contents in a StringBuilder Object (handling long string content)
+                                StringBuilder content = new StringBuilder();
+                                try {
+                                    BufferedReader reader = new BufferedReader(new FileReader(textFileToRead));
+                                    String line;
+                                    while ((line = reader.readLine()) != null) {
+                                        content.append(line + '\n');
+                                    }
+                                    reader.close();
+                                    Log.e("TAG", "Content: " + content);
+
+                                } catch (IOException e) {
+                                    Log.e("TAG", "Error reading the file requested.");
+
+                                }
+                            }else {
+                                //若不存在，创建目录，可以在应用启动的时候创建
+                                words.mkdirs();
+                                setTitle("paht ok,path:"+Wordsfile);
+                                Log.e("Stop","create file successful"+Wordsfile);
+                            }
+                        }
+                    }
+
+                    }catch(Exception ex)
+                    {
+                        Log.e("TAG", "Error: " + ex.getMessage(), ex);
+
+                    }
 
                 Intent intent=new Intent(Start.this,Stop.class);
                 intent.putExtra("routefiletocamera",filename);

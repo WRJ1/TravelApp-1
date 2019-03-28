@@ -3,37 +3,32 @@ package com.example.travelapp;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -149,6 +144,7 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
      * @param uploadView
      */
     protected void onUpload(View uploadView) {
+
         Toast.makeText(this, "点击提交，可在此处调用finish()", Toast.LENGTH_LONG).show();
         wordsPath = Environment.getExternalStorageDirectory().getPath() +"/words/"+ routefile + "myWords" +"_"+ filename() + ".txt";
         Log.e("TTR",wordsPath);
@@ -160,6 +156,7 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
         }
         else path = wordsPath;
         Log.e("TTR",path+words);
+
         //检测文件输入权限
         checkStoragePression(new OnCheckStoragePermission() {
             @Override
@@ -171,6 +168,7 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
                         //写数据到文件中
                         outputStream.write(words.getBytes());
                         outputStream.close();
+                        Log.e("TTR","write successful");
 
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
