@@ -211,6 +211,8 @@ public class Start extends AppCompatActivity implements LocationSource, AMapLoca
                     // 权限被用户拒绝了。
                     //Toast.makeText(Start.this, "定位权限被禁止，相关地图功能无法使用！",Toast.LENGTH_LONG).show();
                     Log.e("Start","定位权限被禁止，相关地图功能无法使用！");
+                    Toast.makeText(Start.this, "Please open the access for locating!", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
 
             }

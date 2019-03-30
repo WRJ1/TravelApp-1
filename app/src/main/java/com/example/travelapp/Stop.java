@@ -140,22 +140,6 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
 
     }
 
-    /**
-     * android6.0动态权限申请：相机使用权限
-     **/
-    public void checkCameraPression(PhotoWithWord.OnCheckCameraPermission callback) {
-        mOnCheckCameraPermission = callback;
-        if (Build.VERSION.SDK_INT >= 23) {
-            int checkCamerapression = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-            if (checkCamerapression != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_CAMERA);
-                return;
-            }
-            mOnCheckCameraPermission.onCheckCameraPression(true);
-            return;
-        }
-        mOnCheckCameraPermission.onCheckCameraPression(true);
-    }
    public void screenShot(View v){
       aMap.getMapScreenShot(this);
       Log.e("screenshot",MapsPath);

@@ -1,14 +1,22 @@
 package com.example.travelapp;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.camera2.CameraManager;
+import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,7 +30,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+import java.lang.String;
 public class PhotoWithWord extends TitleTravelRecord {
     private ImageView picture;
     private EditText typewords;
@@ -60,7 +68,7 @@ public class PhotoWithWord extends TitleTravelRecord {
         bundle = this.getIntent().getExtras();
         Show_Choice = bundle.getInt("id");
 
-        //检查各项权限
+        //检查相机权限
         checkCameraPression(new OnCheckCameraPermission() {
             @Override
             public void onCheckCameraPression(boolean haspermission) {
@@ -70,31 +78,27 @@ public class PhotoWithWord extends TitleTravelRecord {
                         public void onCheckStoragePression(boolean hasStorePermission) {
                             if (hasStorePermission) {
                                 Log.e("PWW_camera_permission","you can use camera");
+                                sdcardTempFile = new File(photoPath);
+                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                                    intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(PhotoWithWord.this, "com.example.travelapp.fileprovider", sdcardTempFile));
+                                } else {
+                                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(sdcardTempFile));
+                                }
+                                startActivityForResult(intent, 101);
                             }
                         }
+
                     });
+
+                }
+                else {
+                    finish();
+                    Toast.makeText(PhotoWithWord.this, "Please open the access for using camera!", Toast.LENGTH_SHORT).show();
                 }
             }
        });
-
-        //接收Intent传递的id值，并判断，照相功能为1，打开相册功能为2
-        switch (Show_Choice) {
-            //如果传递为TAKE_PHOTO
-            case TAKE_PHOTO: {
-                sdcardTempFile = new File(photoPath);
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(PhotoWithWord.this, "com.example.travelapp.fileprovider", sdcardTempFile));
-                } else {
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(sdcardTempFile));
-                }
-                startActivityForResult(intent, 101);
-            }
-            break;
-            default:
-                break;
-        }
     }
 
 
