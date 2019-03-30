@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
@@ -51,6 +52,8 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
     private String MapsPath;
     private AMap aMap;
     private MapView mapView;
+    protected TitleTravelRecord.OnCheckCameraPermission mOnCheckCameraPermission;
+    public final int PERMISSIONS_CAMERA = 2;
 
     //以前的定位点
     private LatLng oldLatLnog;
@@ -116,75 +119,6 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
                 Intent intent = new Intent();
                 intent.setClass(Stop.this, Words.class);
                 intent.putExtra("starttime",routefile);
-                /*try {
-                    if (ExternalStorageUtil.isExternalStorageMounted()) {
-
-                        // Check whether this app has write external storage permission or not.
-                        int writeExternalStoragePermission = ContextCompat.checkSelfPermission(Stop.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                        // If do not grant write external storage permission.
-                        if (writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
-                            // Request user to grant write external storage permission.
-                            ActivityCompat.requestPermissions(Stop.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 119);
-                        } else {
-
-                            // Specify the directory to use
-                            //String publicDirectory = ExternalStorageUtil.getPublicExternalStorageBaseDir(Environment.DIRECTORY_DCIM);
-                            String Wordsfile = Environment.getExternalStorageDirectory().getPath() + "/Words";
-                            File words = new File(Wordsfile);
-                            if (words.exists()) {
-                                String publicDirectory = ExternalStorageUtil.getPublicExternalStorageBaseDir(Environment.getRootDirectory().getPath());
-                                Log.e("TAG", publicDirectory);
-                                File fileAll = new File(publicDirectory);
-                                //Get the list of the files in this directory
-                                File[] files = fileAll.listFiles();
-                                for (File file : files) {
-                                    Log.e("TAG", "File found: " + file.getName());
-                                }
-                                //Write a new file in this directory
-                                String fileName = "my_file.txt";
-                                File newFile = new File(publicDirectory, fileName);
-                                FileWriter fw = new FileWriter(newFile);
-                                fw.write("Insert this text");
-                                fw.flush();
-                                fw.close();
-                                Log.e("TAG", "Saved: " + newFile.getAbsolutePath());*/
-
-                                /**
-                                 * Read the file content
-                                 */
-
-                                // Get The Text file
-                                /*File textFileToRead = new File(publicDirectory, fileName);
-
-                                // Read the file Contents in a StringBuilder Object (handling long string content)
-                                StringBuilder content = new StringBuilder();
-                                try {
-                                    BufferedReader reader = new BufferedReader(new FileReader(textFileToRead));
-                                    String line;
-                                    while ((line = reader.readLine()) != null) {
-                                        content.append(line + '\n');
-                                    }
-                                    reader.close();
-                                    Log.e("TAG", "Content: " + content);
-
-                                } catch (IOException e) {
-                                    Log.e("TAG", "Error reading the file requested.");
-
-                                }
-                            }else {
-                                //若不存在，创建目录，可以在应用启动的时候创建
-                                words.mkdirs();
-                                setTitle("paht ok,path:"+Wordsfile);
-                                Log.e("Stop","create file successful"+Wordsfile);
-                            }
-                        }
-                    }
-
-                    }catch(Exception ex)
-                    {
-                        Log.e("TAG", "Error: " + ex.getMessage(), ex);
-
-                    }*/
                 Stop.this.startActivity(intent);//启动新的Intent，
             }
         });
@@ -192,12 +126,6 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*//记录路程结束时间
-                SimpleDateFormat timesdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String FileTime =timesdf.format(new Date()).toString();//获取系统时间
-                String stoptime = FileTime.replace(":", "");
-                Intent stoptimeintent = new Intent();
-                stoptimeintent.putExtra("stoptime",stoptime);*/
                 Intent intent=new Intent(Stop.this,UploadSuccessful.class);
                 intent.putExtra("starttime",starttime);
                Log.e("StopL",stopLocation);
@@ -212,6 +140,22 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
 
     }
 
+    /**
+     * android6.0动态权限申请：相机使用权限
+     **/
+    public void checkCameraPression(PhotoWithWord.OnCheckCameraPermission callback) {
+        mOnCheckCameraPermission = callback;
+        if (Build.VERSION.SDK_INT >= 23) {
+            int checkCamerapression = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+            if (checkCamerapression != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_CAMERA);
+                return;
+            }
+            mOnCheckCameraPermission.onCheckCameraPression(true);
+            return;
+        }
+        mOnCheckCameraPermission.onCheckCameraPression(true);
+    }
    public void screenShot(View v){
       aMap.getMapScreenShot(this);
       Log.e("screenshot",MapsPath);
@@ -318,7 +262,7 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
                             + aMapLocation.getDistrict() + ""
                             + aMapLocation.getStreet() + ""
                             + aMapLocation.getStreetNum());
-                    Toast.makeText(getApplicationContext(), buffer.toString(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), buffer.toString(), Toast.LENGTH_LONG).show();
                     isFirstLoc = false;
                 }
                stopLocation = aMapLocation.getStreet();
@@ -333,7 +277,7 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
                 Log.e("AmapError", "location Error, ErrCode:"
                         + aMapLocation.getErrorCode() + ", errInfo:"
                         + aMapLocation.getErrorInfo());
-                Toast.makeText(getApplicationContext(), "定位失败", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "定位失败", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -404,7 +348,7 @@ public class Stop extends AppCompatActivity implements LocationSource, AMapLocat
             if (b)
                 Toast.makeText(this, "Your trip is finished! Upload successful!", Toast.LENGTH_SHORT).show();
             else {
-                Toast.makeText(this, "截屏失败", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(this, "截屏失败", Toast.LENGTH_SHORT).show();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

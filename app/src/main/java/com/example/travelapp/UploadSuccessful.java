@@ -53,9 +53,6 @@ public class UploadSuccessful extends TitleTravelRecord {
         showUploadView(false);
 
         //获取路线时间
-        //获取起始时间
-        //Intent intentroutefile = getIntent();
-        //routefile = intentroutefile.getStringExtra("starttime");
         Intent intentroutefile = getIntent();
         routetime = intentroutefile.getStringExtra("starttime");
         Log.e("TRD_getrouteTime",routetime);
@@ -80,13 +77,6 @@ public class UploadSuccessful extends TitleTravelRecord {
         mRecordPhotos = getImagePathFromSD();
         String photodescribe="",photoid="";
         int length;
-       /* if (mRecordWords.size()>mRecordPhotos.size()){
-            length = mRecordWords.size();
-            Log.e("lengthw",String.valueOf(length));
-       }else {
-            length = mRecordPhotos.size();
-             Log.e("length", String.valueOf(length));
-        }*/
         length = onlywords+mRecordPhotos.size();
         int p = 0;
         for (int i = 0; i < length; i++) {
@@ -115,27 +105,6 @@ public class UploadSuccessful extends TitleTravelRecord {
 
             p++;
         }
-        /*for (int i = 0 ; i < Images.imageUrls.length ; i++){
-            String data = Images.imageUrls[i];
-            mDatas.add(data);
-        }*/
-
-        /*RecordDetail view =new RecordDetail("好看好看好看！",R.mipmap.view);
-        recordDetailList.add(view);
-        RecordDetail view1 =new RecordDetail("好看好看好看好看好看好看好看好看好看好看好看好看好看好看！",R.mipmap.view1);
-        recordDetailList.add(view1);
-        RecordDetail view2 =new RecordDetail("好看！",R.mipmap.view2);
-        recordDetailList.add(view2);
-        RecordDetail view3 =new RecordDetail("好看好看好看好看好看好看好看好看！",R.mipmap.view3);
-        recordDetailList.add(view3);
-        RecordDetail view4 =new RecordDetail("好看好看好看好看好看好看好看好看好看好看好看好看好看好看好看好看好看好看好看好看！",R.mipmap.view4);
-        recordDetailList.add(view4);
-        RecordDetail view5 =new RecordDetail("好看好看好看！",R.mipmap.view5);
-        recordDetailList.add(view5);
-        RecordDetail view6 =new RecordDetail("好看好看！",R.mipmap.view6);
-        recordDetailList.add(view6);
-        RecordDetail view7 =new RecordDetail("好看好看好看好看好看好看好看好看好看好看！",R.mipmap.view7);
-        recordDetailList.add(view7);*/
     }
 
     /**
@@ -204,10 +173,6 @@ public class UploadSuccessful extends TitleTravelRecord {
         // 将所有的文件存入ArrayList中,并过滤所有图片格式的文件
         for (int i = 0; i < files.length; i++) {
             File file = files[i];
-                /*if (!files[i].isDirectory()) {
-                    String filename = files[i].getName();
-                    Log.e("TRD_PHOTO_file_name", filename);
-                }*/
             String routes = file.getPath();
             if (checkIsImageFile(file.getPath())) {
                 Log.e("TRD_PHOTO_READroute", routes);

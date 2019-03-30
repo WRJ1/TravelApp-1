@@ -201,10 +201,6 @@ public class TravelRecordDetail extends TitleTravelRecord {
             // 将所有的文件存入ArrayList中,并过滤所有图片格式的文件
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
-                /*if (!files[i].isDirectory()) {
-                    String filename = files[i].getName();
-                    Log.e("TRD_PHOTO_file_name", filename);
-                }*/
                 String routes = file.getPath();
                 if (checkIsImageFile(file.getPath())) {
                     Log.e("TRD_PHOTO_READroute", routes);

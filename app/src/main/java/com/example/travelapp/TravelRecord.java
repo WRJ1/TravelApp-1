@@ -48,19 +48,6 @@ public class TravelRecord extends TitleTravelRecord {
             public void onItemClick(View view, int position) {
                 position = recyclerView.getChildAdapterPosition(view);
                 Intent intent;
-               /* switch (position) {
-                    case 0:
-                        //setContentView(R.layout.activity_travel_record_detail);
-                        intent = new Intent(TravelRecord.this, TravelRecordDetail.class);
-                        //Log.e("TR","start");
-                        startActivity(intent);
-                        break;
-                    case 1:
-                        //setContentView(R.layout.activity_travel_record_detail);
-                        intent = new Intent(TravelRecord.this, TravelRecordDetail.class);
-                        startActivity(intent);
-                        break;
-                }*/
                 intent = new Intent(TravelRecord.this, TravelRecordDetail.class);
                 String map = mMaps.get(position);
                 Log.e("TR_route_press",map);
@@ -90,10 +77,6 @@ public class TravelRecord extends TitleTravelRecord {
             Record record = new Record(date, location);
             recordList.add(record);
         }
-       /*Record r1 = new Record("2018/03/19", "CQU-HongyaCave");
-        recordList.add(r1);
-        Record r2 = new Record("2018/03/20", "CQU-SFAI");
-        recordList.add(r2);*/
     }
 
     /**

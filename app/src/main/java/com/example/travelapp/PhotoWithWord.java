@@ -69,14 +69,13 @@ public class PhotoWithWord extends TitleTravelRecord {
                         @Override
                         public void onCheckStoragePression(boolean hasStorePermission) {
                             if (hasStorePermission) {
-                                //showBottomDialog();
-                                Toast.makeText(PhotoWithWord.this, "you can use camera", Toast.LENGTH_LONG).show();
+                                Log.e("PWW_camera_permission","you can use camera");
                             }
                         }
                     });
                 }
             }
-        });
+       });
 
         //接收Intent传递的id值，并判断，照相功能为1，打开相册功能为2
         switch (Show_Choice) {
@@ -97,6 +96,7 @@ public class PhotoWithWord extends TitleTravelRecord {
                 break;
         }
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -124,6 +124,8 @@ public class PhotoWithWord extends TitleTravelRecord {
                 break;
         }
     }
+
+
 
     //修正照片的旋转角度
     public static void setPictureDegreeZero(String path) {
@@ -174,10 +176,6 @@ public class PhotoWithWord extends TitleTravelRecord {
 
     //根据时间命名照片
     public String filename() {
-        //SimpleDateFormat timesdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        //SimpleDateFormat filesdf = new SimpleDateFormat("yyyy-MM-dd HHmmss"); //文件名不能有：
-        //String FileTime =timesdf.format(new Date()).toString();//获取系统时间
-        //String filename = FileTime.replace(":", "");
         SimpleDateFormat hour = new SimpleDateFormat("HH");//获取小时
         SimpleDateFormat minute = new SimpleDateFormat("mm");//获取分钟
         SimpleDateFormat second = new SimpleDateFormat("ss");//获取秒

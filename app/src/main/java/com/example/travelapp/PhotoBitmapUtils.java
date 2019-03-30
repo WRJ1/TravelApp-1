@@ -131,18 +131,6 @@ public class PhotoBitmapUtils {
      */
     public static String amendRotatePhoto(String originpath, Context context) {
 
-        // 取得图片旋转角度
-        //int angle = readPictureDegree(originpath);
-
-        // 把原图压缩后得到Bitmap对象
-        //Bitmap bmp = getCompressPhoto(originpath);;
-
-        // 修复图片被旋转的角度
-        //Bitmap bitmap = rotaingImageView(angle, bmp);
-
-        // 保存修复后的图片并返回保存后的图片路径
-        //return savePhotoToSD(bitmap, context);
-
         BitmapFactory.Options options = new BitmapFactory.Options();
         Bitmap bitmap = BitmapFactory.decodeFile(originpath, options);
         Matrix mat = new Matrix();
@@ -165,15 +153,6 @@ public class PhotoBitmapUtils {
             e.printStackTrace();
         }
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), mat, true);
-            /*ExifInterface exifInterface = null;
-            try {
-                exifInterface = new ExifInterface(originpath);
-                exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION,Integer.toString(ExifInterface.ORIENTATION_ROTATE_90));
-                exifInterface.saveAttributes();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
-        //Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
         return savePhotoToSD(bitmap, context);
         //return originpath;
     }
@@ -190,18 +169,7 @@ public class PhotoBitmapUtils {
             ExifInterface exifInterface = new ExifInterface(path);
             exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION,Integer.toString(ExifInterface.ORIENTATION_ROTATE_90));
             exifInterface.saveAttributes();
-            //int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                /*switch (orientation) {
-                    case ExifInterface.ORIENTATION_ROTATE_90:
-                        degree = 90;
-                        break;
-                    case ExifInterface.ORIENTATION_ROTATE_180:
-                        degree = 180;
-                        break;
-                    case ExifInterface.ORIENTATION_ROTATE_270:
-                        degree = 270;
-                        break;
-                }*/
+
         } catch (IOException e) {
             e.printStackTrace();
         }

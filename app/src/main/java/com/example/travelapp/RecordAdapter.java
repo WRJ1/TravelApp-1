@@ -12,11 +12,6 @@ import java.util.List;
 public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder> {
     private List<Record> mrecordList;
 
-    //private OnRecyclerViewClickListener listener;
-    /*public void setItemClickListener(OnRecyclerViewClickListener itemClickListener) {
-        listener = itemClickListener;
-    }*/
-
     //自己实现item点击事件
     public interface OnItemClickLitener {
         void onItemClick(View view, int position);

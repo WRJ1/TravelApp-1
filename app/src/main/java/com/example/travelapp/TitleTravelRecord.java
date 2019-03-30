@@ -48,20 +48,11 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
     private String routefile;
     private String wordsPath;
     private String photoWithWordsPath;
-    /*public TitleTravelRecord(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        LayoutInflater.from(context).inflate(R.layout.titile_travelrecord, this);
-    }*/
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupViews();   //加载 activity_title_travel_record 布局 ，并获取标题及按钮
-        /*Intent intentroutefile = getIntent();
-        routefile = intentroutefile.getStringExtra("routefiletowords");*/
-        /*wordsPath = Environment.getExternalStorageDirectory().getPath() +"/words/"+ routefile + "myWords" + filename() + ".txt";
-        Log.e("TTR",wordsPath);
-        photoWithWordsPath = Environment.getExternalStorageDirectory().getPath() + "/words" + routefile + filename() + ".txt";
-        Log.e("TTR",photoWithWordsPath);*/
     }
 
     private void setupViews() {
@@ -131,10 +122,8 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
      * @param backwardView
      */
     protected void onBackward(View backwardView) {
-        Toast.makeText(this, "点击返回，可在此处调用finish()", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "点击返回，可在此处调用finish()", Toast.LENGTH_LONG).show();
         finish();
-        /*Intent intent=new Intent(this,MainActivity.class);
-        startActivity(intent);*/
 
     }
 
@@ -145,7 +134,6 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
      */
     protected void onUpload(View uploadView) {
 
-        Toast.makeText(this, "点击提交，可在此处调用finish()", Toast.LENGTH_LONG).show();
         wordsPath = Environment.getExternalStorageDirectory().getPath() +"/words/"+ routefile + "myWords" +"_"+ filename() + ".txt";
         Log.e("TTR",wordsPath);
         photoWithWordsPath = Environment.getExternalStorageDirectory().getPath() + "/words/" + routefile +"_"+ filename() + ".txt";
@@ -200,8 +188,6 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        /*Intent intent=new Intent(this,MainActivity.class);
-        startActivity(intent);*/
         finish();
     }
 
@@ -377,10 +363,6 @@ public class TitleTravelRecord extends Activity implements View.OnClickListener 
 
     //根据时间命名文件
     public String filename(){
-        /*SimpleDateFormat timesdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        //SimpleDateFormat filesdf = new SimpleDateFormat("yyyy-MM-dd HHmmss"); //文件名不能有：
-        String FileTime =timesdf.format(new Date()).toString();//获取系统时间
-        String filename = FileTime.replace(":", "");*/
         SimpleDateFormat hour = new SimpleDateFormat("HH");//获取小时
         SimpleDateFormat minute = new SimpleDateFormat("mm");//获取分钟
         SimpleDateFormat second = new SimpleDateFormat("ss");//获取秒

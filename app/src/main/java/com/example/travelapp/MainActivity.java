@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity{
         titleHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this,"History",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this,"History",Toast.LENGTH_SHORT).show();
                 try {
                     if (ExternalStorageUtil.isExternalStorageMounted()) {
 
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity{
         titleNewRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "NewRoute", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "NewRoute", Toast.LENGTH_SHORT).show();
                 Intent intent=new Intent(MainActivity.this,Start.class);
                 startActivity(intent);
             }

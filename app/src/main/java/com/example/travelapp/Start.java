@@ -86,7 +86,6 @@ public class Start extends AppCompatActivity implements LocationSource, AMapLoca
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(Start.this,"Start route",Toast.LENGTH_SHORT).show();
                 //记录路程开始时间
                 SimpleDateFormat timesdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String FileTime =timesdf.format(new Date()).toString();//获取系统时间
@@ -184,12 +183,12 @@ public class Start extends AppCompatActivity implements LocationSource, AMapLoca
                 // 没有权限，申请权限。
                 // 申请授权。
                 ActivityCompat.requestPermissions(Start.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_CODE);
-                Toast.makeText(Start.this, "没有权限", Toast.LENGTH_SHORT).show();
 
             } else {
 
+                Log.e("Start","有权限");
                 // 有权限了，去放肆吧。
-                Toast.makeText(Start.this, "有权限", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(Start.this, "有权限", Toast.LENGTH_SHORT).show();
             }
         } else {
             Log.e("BRG","系统检测到未开启GPS定位服务");
@@ -210,7 +209,8 @@ public class Start extends AppCompatActivity implements LocationSource, AMapLoca
 
                 } else {
                     // 权限被用户拒绝了。
-                    Toast.makeText(Start.this, "定位权限被禁止，相关地图功能无法使用！",Toast.LENGTH_LONG).show();
+                    //Toast.makeText(Start.this, "定位权限被禁止，相关地图功能无法使用！",Toast.LENGTH_LONG).show();
+                    Log.e("Start","定位权限被禁止，相关地图功能无法使用！");
                 }
 
             }
@@ -319,7 +319,7 @@ public class Start extends AppCompatActivity implements LocationSource, AMapLoca
                             + aMapLocation.getDistrict() + ""
                             + aMapLocation.getStreet() + ""
                             + aMapLocation.getStreetNum());
-                    Toast.makeText(getApplicationContext(), buffer.toString(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), buffer.toString(), Toast.LENGTH_LONG).show();
                     startLocation = aMapLocation.getStreet();
                     isFirstLoc = false;
                 }
@@ -330,7 +330,7 @@ public class Start extends AppCompatActivity implements LocationSource, AMapLoca
                 Log.e("AmapError", "location Error, ErrCode:"
                         + aMapLocation.getErrorCode() + ", errInfo:"
                         + aMapLocation.getErrorInfo());
-                Toast.makeText(getApplicationContext(), "定位失败", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "定位失败", Toast.LENGTH_LONG).show();
             }
         }
     }
